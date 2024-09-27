@@ -1,0 +1,25 @@
+The approximate 4-hour time constraint, which was mentioned to me (and which I already exceeded), influenced some of the choices I made. Here are my notes:
+
+- I opted for a client-only Vite/React/TypeScript solution. I did not use a framework like next.js because, as far as I understood the requirements, I was supposed to only implement the search page. Thus no need for routing. next.js would have also allowed for SSR. But given the scope, this didn't seem required either. The benefit (in a realistic setting) is often a faster initial page load and possibly improved SEO, but with the need for hydrating the page.
+- Since it's only about this one page, I kept all the links in the page empty (using "#").
+- App.tsx serves as kind of a layout component here, including header, sidebar and footer (for the sidebar it would depend whether it's part of every page or not). I wrote a simple integration test for it.
+- App is wrapped in StrictMode, which has certain implications: https://react.dev/reference/react/StrictMode
+- Since I don't have multiple pages, I put the Search into a "container" folder. While container components are not strictly necessary (https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0), in this case it made sense to me.
+- Also because it's only one page, and the only dynamic part is the search, which has a flat component tree (no prop drilling happening), I did not use Redux or Context to introduce global state.
+- While bower.io/search uses a table to display search results, and has the name, owner and stars in the table header, I rather decided to show the results in simpler/cleaner way like github does it, for example ( https://github.com/search?q=vue&type=repositories&s=&o=desc)
+- The API key was simply taken from the bower site (as it's part of the url). In a real app you would not want to expose API keys, of course. But hide them in environment variables, for example.
+- The footer on the bowers site was below the search results, which I thought was not ideal. So, I created a simple one at the bottom of the page instead.
+- API docs didn't explictly show types/possible values of all fields. But I put all I was able infer from the example responses on the docs page into the ApiResult type, and wrote tests accordingly.
+- As there is no "owner" property in the API response, it seemed like bower.io/search is extracting it from the "repository_url". so, i did the same here. With using a part of the "full_name" as a fallback.
+- The API does not provide the full number of results for pagination. Loading all results upfront and then filtering on the client seemed too wasteful to me (overfetching). Hence I implemented a simple pagination with just a "previous" and "next" button, which are either disabled or enabled. Like a simplified Google pagination.
+- I did not add an abort controller for cancelling "unncessary" requests (like when a user initiates another search while another search request one is still ongoing; sometimes the api is also very slow to respond, which could be another use case).
+- I only added simple error handling (showing a message), no retry mechanism or so.
+- I decided to reset the sorting to "popularity" if a new search term is entered, but not when paginating.
+- I left the default search-cancel-button in place for the search input instead of providing a customized one. It still looks OK and does the job. For a production site I would replace it. I also just fire a new search for the empty query, which is loading popular packages, like the initial load.
+- Instead of writing plain (S)CSS, using a (CSS-in-JS) or a UI library, I chose Tailwind CSS as a middle ground. It allows for fast prototyping/development and still offers flexibility. In a real setting I might not choose it (though many people seem to do). During development it doesn't remove unused classes, but for the prod build this is done. And there minifaction can be added, too, which I didn't do here.
+- Design-wise I losely copied the the look & feel from the bower site but took many liberties. While I had to keep simple, I still tried to make it look nice.
+- I did not copy the highlighting of the search term on the page which the bower site has. I found that to be distracting and not very "beautiful".
+- I do not use text to indidicate that results are being loaded, but show a simple skeleton instead. This also helps to prevent "jumps" in the UI.
+- I did not add any image optimization.
+- I added mostly basic accessibility at least by using semantic markup, some best practices like alt attributes and a few aria attributes. I did not create a full form for the search but kept it minimal. Also, some of the color contrast is quite low.
+- Even with setting "css: true" and importing styles in the setupTests file, I wasn't able to test the mobile version of the Sidebar. Seemed like the Tailwind classes didn't take effect or the testing setup didn't allow for determining they did.
