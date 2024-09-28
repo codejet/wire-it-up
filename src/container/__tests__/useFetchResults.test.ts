@@ -2,6 +2,7 @@ import { Mock } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useFetchResults } from '../useFetchResults';
 import { mapSearchResults } from '../../utils/utils';
+import { SortingOptions } from '../../types/search';
 
 vi.mock('../../utils/utils', () => ({
   mapSearchResults: vi.fn(),
@@ -147,7 +148,8 @@ describe('useFetchResults', () => {
     (mapSearchResults as Mock).mockReturnValue(mappedResults);
 
     const { result, rerender } = renderHook(
-      ({ query, page, sort }) => useFetchResults(query, page, sort),
+      ({ query, page, sort }) =>
+        useFetchResults(query, page, sort as SortingOptions),
       {
         initialProps: { query: '', page: 1, sort: 'stars' },
       },

@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { SearchResult } from '../types/search';
+import { SearchResult, SortingOptions } from '../types/search';
 import { mapSearchResults } from '../utils/utils';
 
 // Note: API key borrowed from bower.io :p
 const API_KEY = '782c0bcca2235968b49e9826e2f787da';
 
-export const useFetchResults = (query: string, page: number, sort: string) => {
+export const useFetchResults = (
+  query: string,
+  page: number,
+  sort: SortingOptions,
+) => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
